@@ -1,0 +1,10 @@
+package com.example.callee.controller;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class ResponseData {
+    private String data;
+}
