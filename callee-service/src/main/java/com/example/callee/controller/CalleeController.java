@@ -40,7 +40,7 @@ public class CalleeController {
             case "success" -> new ResponseData("OK");
             case "fail" -> throw new RuntimeException("Simulated 500 Error");
             case "slow" -> {
-                Thread.sleep(4000); // > readTimeout (2500ms)
+                Thread.sleep(calleeConfig.getTimeOut()); // > readTimeout (2500ms)
                 yield new ResponseData("Slow");
             }
             case "flaky" -> {
