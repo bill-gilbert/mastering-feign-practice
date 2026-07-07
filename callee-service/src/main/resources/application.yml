@@ -8,4 +8,4 @@ app:
   calee:
     correct-response: true
     time-out: 10000
-    response-mode: correct
+    response-mode: success

@@ -37,7 +37,7 @@ public class CalleeController {
     public ResponseData getData() throws InterruptedException {
 
         return switch (calleeConfig.getResponseMode()) {
-            case "correct" -> new ResponseData("OK");
+            case "success" -> new ResponseData("OK");
             case "fail" -> throw new RuntimeException("Simulated 500 Error");
             case "slow" -> {
                 Thread.sleep(4000); // > readTimeout (2500ms)
