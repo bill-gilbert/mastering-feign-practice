@@ -1,6 +1,7 @@
 package com.example.caller.controller;
 
 import com.example.caller.client.CalleeClient;
+import com.example.caller.controller.dto.ResponseData;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +17,7 @@ public class CallController {
     }
 
     @GetMapping
-    public String call(@RequestParam(defaultValue = "ok") String mode) {
-        return calleeClient.getResponse(mode);
+    public ResponseData call() {
+        return calleeClient.getResponseWithMode();
     }
 }
