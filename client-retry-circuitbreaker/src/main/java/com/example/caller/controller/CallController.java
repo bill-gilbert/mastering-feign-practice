@@ -8,13 +8,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/call")
+@RequestMapping("/api/v1/circuitbreaker")
 @RequiredArgsConstructor
 public class CallController {
     private final CalleeClient calleeClient;
 
-    @GetMapping
+    @GetMapping("/call")
     public ResponseData call() {
+        return calleeClient.getResponseWithMode("mode");
+    }
+
+    @GetMapping("/call/data")
+    public ResponseData callData() {
         return calleeClient.getResponseWithMode("mode");
     }
 }
