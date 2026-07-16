@@ -1,0 +1,51 @@
+server:
+  port: 18081
+
+spring:
+  application:
+    name: caller-service
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+# Настройки Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      calleeService: # Имя должно СОВПАДАТЬ с @FeignClient(name = "...")
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slowCallRateThreshold: 100
+        slowCallDurationThreshold: 2s
+  retry:
+    instances:
+      calleeService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - java.lang.RuntimeException
+          - java.io.IOException
+          - feign.FeignException
+
+# Актуатор для наблюдения за состоянием CB
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, circuitbreakers, circuitbreakerevents
+  endpoint:
+    circuitbreakers:
+      enabled: true
+    circuitbreakerevents:
+      enabled: true
+
+# Таймауты Feign
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 2000
+        readTimeout: 2500
