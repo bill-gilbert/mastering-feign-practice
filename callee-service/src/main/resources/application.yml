@@ -5,7 +5,8 @@ spring:
     name: callee-service
 
 app:
-  calee:
+  callee:
     correct-response: true
-    time-out: 10000
+    # Intentionally longer than the Feign read timeout (1 second).
+    time-out: 3000
     response-mode: success

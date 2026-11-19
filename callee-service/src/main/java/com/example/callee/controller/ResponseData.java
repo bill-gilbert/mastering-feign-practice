@@ -1,10 +1,5 @@
 package com.example.callee.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class ResponseData {
-    private String data;
+/** The deliberately small response contract used by the Feign lab. */
+public record ResponseData(String data) {
 }

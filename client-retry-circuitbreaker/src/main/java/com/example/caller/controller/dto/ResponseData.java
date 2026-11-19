@@ -1,10 +1,12 @@
 package com.example.caller.controller.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+/** Response returned by the caller. The last two fields reveal a fallback clearly. */
+public record ResponseData(String data, boolean fallback, String reason) {
+    public static ResponseData success(String data) {
+        return new ResponseData(data, false, null);
+    }
 
-@Data
-@AllArgsConstructor
-public class ResponseData {
-    private String data;
+    public static ResponseData fallback(String reason) {
+        return new ResponseData("FALLBACK", true, reason);
+    }
 }

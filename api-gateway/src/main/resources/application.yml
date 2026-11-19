@@ -1,0 +1,23 @@
+server:
+  port: 18082
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: callee-service
+          uri: ${CALLEE_SERVICE_URL:http://localhost:18080}
+          predicates:
+            - Path=/callee/**
+          filters:
+            - StripPrefix=1
+            - AddRequestHeader=X-Gateway, feign-lab
+            - AddResponseHeader=X-Gateway, feign-lab
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

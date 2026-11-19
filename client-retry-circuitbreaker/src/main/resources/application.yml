@@ -8,44 +8,42 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+      client:
+        config:
+          default:
+            connectTimeout: 500
+            readTimeout: 1000
+            loggerLevel: full
 
-# Настройки Resilience4j
 resilience4j:
   circuitbreaker:
     instances:
-      calleeService: # Имя должно СОВПАДАТЬ с @FeignClient(name = "...")
-        slidingWindowSize: 10
+      # This matches CircuitBreakerConfiguration, not a generated Feign method name.
+      calleeService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 4
+        minimumNumberOfCalls: 4
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slowCallRateThreshold: 100
-        slowCallDurationThreshold: 2s
-  retry:
-    instances:
-      calleeService:
-        maxAttempts: 3
-        waitDuration: 500ms
-        retryExceptions:
-          - java.lang.RuntimeException
-          - java.io.IOException
-          - feign.FeignException
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        # A bad request must not mark a healthy service as unavailable.
+        ignoreExceptions:
+          - com.example.caller.client.CalleeClientException
 
-# Актуатор для наблюдения за состоянием CB
 management:
   endpoints:
     web:
       exposure:
-        include: health, circuitbreakers, circuitbreakerevents
+        include: health,info,circuitbreakers,circuitbreakerevents,metrics
   endpoint:
     circuitbreakers:
       enabled: true
     circuitbreakerevents:
       enabled: true
 
-# Таймауты Feign
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 2000
-        readTimeout: 2500
+callee:
+  # The caller goes through the gateway by default. Set CALLEE_URL=http://localhost:18080
+  # to compare this path with a direct Feign call.
+  url: ${CALLEE_URL:http://localhost:18082/callee}

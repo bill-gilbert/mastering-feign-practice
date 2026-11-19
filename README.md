@@ -6,6 +6,8 @@ Here you can access the course: [link](https://www.udemy.com/course/mastering-mi
 ## Overview
 The courses focuses on building an example microservice system with resilient HTTP communication using Feign and Spring Cloud OpenFeign along with Netflix Eureka and Resilience4J.
 
+For a standalone Feign → Gateway → Circuit Breaker playground with reproducible failures, see [FEIGN_GATEWAY_LAB.md](FEIGN_GATEWAY_LAB.md).
+
 Among a lot of exciting topics, here's an extract of the curriculum: 
 * Feign request/response mappings using annotations
 * Feign logging

@@ -1,56 +1,51 @@
 package com.example.callee.controller;
 
 import com.example.callee.config.CalleeConfig;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/response")
-@RequiredArgsConstructor
 public class CalleeController {
     private final CalleeConfig calleeConfig;
 
+    public CalleeController(CalleeConfig calleeConfig) {
+        this.calleeConfig = calleeConfig;
+    }
+
     @GetMapping
-    public String handle(@RequestParam(defaultValue = "ok") String mode) throws InterruptedException {
-        return switch (mode) {
-            case "ok" -> "OK: " + System.currentTimeMillis();
-            case "fail" -> throw new RuntimeException("Simulated 500 Error");
-            case "slow" -> {
-                Thread.sleep(4000); // > readTimeout (2500ms)
-                yield "SLOW: " + System.currentTimeMillis();
-            }
-            case "flaky" -> {
-                if (Math.random() > 0.5) {
-                    yield "FLAKY_OK: " + System.currentTimeMillis();
-                } else {
-                    throw new RuntimeException("Flaky 503");
-                }
-            }
-            default -> "UNKNOWN_MODE";
-        };
+    public String handle(@RequestParam(defaultValue = "success") String mode) throws InterruptedException {
+        return respond(mode).data();
     }
 
     @GetMapping("/data")
-    public ResponseData getData() throws InterruptedException {
+    public ResponseData getData(@RequestParam(required = false) String mode) throws InterruptedException {
+        return respond(mode == null ? calleeConfig.getResponseMode() : mode);
+    }
 
-        return switch (calleeConfig.getResponseMode()) {
+    private ResponseData respond(String mode) throws InterruptedException {
+        String actualMode = mode == null || mode.isBlank() ? "success" : mode;
+        return switch (actualMode) {
             case "success" -> new ResponseData("OK");
-            case "fail" -> throw new RuntimeException("Simulated 500 Error");
+            case "fail" -> throw new IllegalStateException("Simulated 500 error");
+            case "unavailable" -> throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Simulated 503 service unavailable");
             case "slow" -> {
-                Thread.sleep(calleeConfig.getTimeOut()); // > readTimeout (2500ms)
-                yield new ResponseData("Slow");
+                Thread.sleep(calleeConfig.getTimeOut());
+                yield new ResponseData("SLOW");
             }
             case "flaky" -> {
                 if (Math.random() > 0.5) {
-                    yield new ResponseData("FlakyOk");
-                } else {
-                    throw new RuntimeException("Flaky 503");
+                    yield new ResponseData("FLAKY_OK");
                 }
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Simulated flaky 503");
             }
-            default -> new ResponseData("UnknownMode");
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Unknown mode: " + actualMode);
         };
     }
 }

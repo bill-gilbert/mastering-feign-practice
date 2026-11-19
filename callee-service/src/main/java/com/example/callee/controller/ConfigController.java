@@ -1,7 +1,6 @@
 package com.example.callee.controller;
 
 import com.example.callee.config.CalleeConfig;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,9 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/config")
-@RequiredArgsConstructor
 public class ConfigController {
     private final CalleeConfig calleeConfiguration;
+
+    public ConfigController(CalleeConfig calleeConfiguration) {
+        this.calleeConfiguration = calleeConfiguration;
+    }
 
     @GetMapping
     public CalleeConfig getConfig() {
@@ -24,5 +26,4 @@ public class ConfigController {
         calleeConfiguration.updateConfig(calleeConfig);
         return calleeConfiguration;
     }
-
 }
